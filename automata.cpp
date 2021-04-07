@@ -90,6 +90,8 @@ WordDFA::WordDFA(const string &word) : AbstractDFA(word.length()+1) {
         //The new transition function has been added to the transition function map
         transitionF.insert(pair<tpair,int>(newState,i+1));
     }
+    //The last state is considered as the final one, so it's added to the finalState vector
+    finalStates.insert(finalStates.end(),word.length());
 }
 
 /**
