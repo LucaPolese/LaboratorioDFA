@@ -36,9 +36,7 @@ protected:
 	 */
 	map<tpair,int> transitionF;
 
-	// - stati
-	// - stati finali ed eventuali stati trappola
-    
+    vector<int> finalStates;
 public:
 	/**
 	 * Constructor for Abstract DFA.
