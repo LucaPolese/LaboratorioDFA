@@ -26,16 +26,16 @@ void AbstractDFA::reset() { actState = initialState; }
  *            The current input.
  */
 void AbstractDFA::doStep(char letter) {
-    //Controllo per verificare
-    //Check to verify that the current state does not correspond to the trap state, otherwise there is no point in proceeding
+    //A check is made to verify that the current state does not correspond to the trap state, otherwise there is no point in proceeding
     if(actState != trapState){
-        //Creo l'iteratore corrispondente allo stato attuale
+        //The iterator corresponding to the transition function is created with input (current status, letter)
         map<tpair, int>::iterator ftran = transitionF.find(tpair(actState,letter));
-        //Devo verificare de l'iteratore si trova in uno stato valido, altrimenti
+        //This is done to verify that the iterator is in a state that allows it to consume the input symbol.
         if(ftran != transitionF.end()){
-            //Scorro al prossimo elemento
-
+            //The automata shifts to the state determined by the transition function
+            actState = ftran->second;
         }else{
+            //The automata is in a state where it isn't possible to proceed, as there are no further transition functions.
             actState = trapState;
         }
     }
@@ -47,7 +47,7 @@ void AbstractDFA::doStep(char letter) {
  * @return True, if the automaton is currently in the accepting state.
  */
 bool AbstractDFA::isAccepting() {
-   return actState
+   return actState;
 }
 
 /**
@@ -75,8 +75,9 @@ bool AbstractDFA::run(const string &inputWord) {
  * @param word
  *            A String that the automaton should recognize
  */
-WordDFA::WordDFA(const string &word) : AbstractDFA(0) {
-    // TODO: fill in correct number of states
+WordDFA::WordDFA(const string &word) : AbstractDFA(word.length()+1) {
+    //AbstractDFA(word.length()+1) because by definition the number of states of a DFA is always equal to the
+    //number of states of the DFA plus one initial state
     
     // TODO: build DFA recognizing the given word
 }
