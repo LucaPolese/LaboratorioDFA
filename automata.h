@@ -35,7 +35,9 @@ protected:
 	 * @param int represents the state in which the transition function sends the input pair
 	 */
 	map<tpair,int> transitionF;
-
+    /**
+     *  @brief This is the vector that rappresents all the final states of the automata
+     */
     vector<int> finalStates;
 public:
 	/**
