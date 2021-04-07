@@ -76,10 +76,20 @@ bool AbstractDFA::run(const string &inputWord) {
  *            A String that the automaton should recognize
  */
 WordDFA::WordDFA(const string &word) : AbstractDFA(word.length()+1) {
-    //AbstractDFA(word.length()+1) because by definition the number of states of a DFA is always equal to the
-    //number of states of the DFA plus one initial state
-    
-    // TODO: build DFA recognizing the given word
+    /*The idea behind this DFA is that each letter of the word must represent a distinct state of the automaton
+     *The class WordDFA inherits the sub-object from AbstractDFA, so it is necessary to make a construction of it
+     *based on the length of the chosen word + 1.
+     *The choice of the +1 is due to the fact that initial state has to be included.
+     *Every state which is not a trapState has to consume a symbol, so each symbol between the position 0 and actState-1
+     *of the word array has been consumed and that the finalState is reached if and only if the word
+     *from 0 to word.length()-1 has been consumed.
+     *This means that the finalState is reached when actState == word.length()*/
+    for(int i = 0; i < word.length();i++){
+        //The ith pair has been created
+        pair<int,char> newState(i,word[i]);
+        //The new transition function has been added to the transition function map
+        transitionF.insert(pair<tpair,int>(newState,i+1));
+    }
 }
 
 /**
