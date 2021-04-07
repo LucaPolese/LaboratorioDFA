@@ -30,7 +30,7 @@ void AbstractDFA::doStep(char letter) {
     if(actState != trapState){
         //The iterator corresponding to the transition function is created with input (current status, letter)
         map<tpair, int>::iterator ftran = transitionF.find(tpair(actState,letter));
-        //This is done to verify that the iterator is in a state that allows it to consume the input symbol.
+        //This check is done to verify that the iterator is in a state that allows it to consume the input symbol.
         if(ftran != transitionF.end()){
             //The automata shifts to the state determined by the transition function
             actState = ftran->second;
@@ -47,6 +47,8 @@ void AbstractDFA::doStep(char letter) {
  * @return True, if the automaton is currently in the accepting state.
  */
 bool AbstractDFA::isAccepting() {
+    //For each final state in the vector "finalStates" a check is made to determine
+    //whether or not the current state belongs to it.
     for(auto it : finalStates){
         if(it == actState) return true;
     }
@@ -82,19 +84,19 @@ WordDFA::WordDFA(const string &word) : AbstractDFA(word.length()+1) {
     /*The idea behind this DFA is that each letter of the word must represent a distinct state of the automaton
      *The class WordDFA inherits the sub-object from AbstractDFA, so it is necessary to make a construction of it
      *based on the length of the chosen word + 1.
-     *The choice of the +1 is due to the fact that initial state has to be included.
+     *The choice of the +1 is due to the fact that the initial state has to be included.
      *Every state which is not a trapState has to consume a symbol, so each symbol between the position 0 and actState-1
-     *of the word array has been consumed and that the finalState is reached if and only if the word
-     *from 0 to word.length()-1 has been consumed.
+     *of the word array has been consumed.
+     *The finalState is reached if and only if the letters between positions 0 to word.length()-1 has been consumed.
      *This means that the finalState is reached when actState == word.length()*/
     for(int i = 0; i < word.length();i++){
-        //The ith pair has been created
+        //The i-th pair has been created
         pair<int,char> newState(i,word[i]);
         //The new transition function has been added to the transition function map
         transitionF.insert(pair<tpair,int>(newState,i+1));
     }
     //The last state is considered as the final one, so it's added to the finalState vector
-    finalStates.insert(finalStates.end(),word.length());
+    finalStates.push_back(word.length());
 }
 
 /**
@@ -103,9 +105,23 @@ WordDFA::WordDFA(const string &word) : AbstractDFA(word.length()+1) {
  * with a newline, multiline comments that starts with (* and ends with *), and
  * multiline comments that starts with { and ends with }
  */
-CommentDFA::CommentDFA() : AbstractDFA(0) {
-    // TODO: fill in correct number of states
-    // TODO: build DFA recognizing comments
+CommentDFA::CommentDFA() : AbstractDFA(8) {
+    // For the accurate representation of the DFA to which this function relates, see the folder:
+    // https://github.com/LucaPolese/PrimaEsercitazioneAutomi/blob/master/out/comment.pdf
+    //As can be seen from the automaton in the illustration, each type of comment corresponds
+    // to a different branch of the automaton.
+    // Both Self-loops on states 2 and 4 and transitions starting from state 6 and 7
+    // are hard coded in the function CommentDFA::doStep(),therefore it's unnecessary
+    // to code them in this method
+    transitionF.insert(pair<tpair, int>(tpair(0, '/'), 1));
+    transitionF.insert(pair<tpair, int>(tpair(1, '/'), 2));
+    transitionF.insert(pair<tpair, int>(tpair(2, '\n'), 3));
+    transitionF.insert(pair<tpair, int>(tpair(0, '{'), 4));
+    transitionF.insert(pair<tpair, int>(tpair(4, '}'), 3));
+    transitionF.insert(pair<tpair, int>(tpair(0, '('), 5));
+    transitionF.insert(pair<tpair, int>(tpair(5, '*'), 6));
+    transitionF.insert(pair<tpair, int>(tpair(7, ')'), 3));
+    finalStates.push_back(3);
 }
 
 /**
@@ -116,7 +132,33 @@ CommentDFA::CommentDFA() : AbstractDFA(0) {
  *            The current input.
  */
 void CommentDFA::doStep(char letter) {
-    // TODO: implement accordingly
+    switch (actState) {
+        case 2:
+            if (letter == '\n') {
+                actState = 3;
+            }
+            break;
+        case 4:
+            if (letter == '}') {
+                actState = 3;
+            }
+            break;
+        case 6:
+            if (letter == '*') {
+                actState = 7;
+            }
+            break;
+        case 7:
+            if (letter == ')') {
+                actState = 3;
+            } else if (letter != '*') {
+                actState = 6;
+            }
+            break;
+        default:
+            AbstractDFA::doStep(letter);
+            break;
+    }
 }	
 
 
