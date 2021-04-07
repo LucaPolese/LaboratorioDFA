@@ -47,7 +47,10 @@ void AbstractDFA::doStep(char letter) {
  * @return True, if the automaton is currently in the accepting state.
  */
 bool AbstractDFA::isAccepting() {
-   return actState;
+    for(auto it : finalStates){
+        if(it == actState) return true;
+    }
+   return false;
 }
 
 /**
